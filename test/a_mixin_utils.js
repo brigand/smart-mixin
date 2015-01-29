@@ -42,7 +42,7 @@ describe('mixin utilities', function(){
         var test = function(leftRet, rightRet){
             var left = sinon.stub().returns(leftRet);
             var right = sinon.stub().returns(rightRet);
-            mixins.MANY(left, right, "manyMerged");
+            var fn = mixins.MANY_MERGED(left, right, "manyMerged");
             return function(){
                 var res = fn([], function(e){ throw e }); 
                 expect(left.called).to.be.ok();
@@ -62,7 +62,7 @@ describe('mixin utilities', function(){
         });
 
         it('throws with duplicate keys', function(){
-            expect(test({a: 1}, {a: 2})).to.throwException(/cannot merge.*both.*manyMerged/);
+            expect(test({a: 1}, {a: 2})).to.throwException(/cannot merge.*both.*"a"/);
         });
     });
 });
