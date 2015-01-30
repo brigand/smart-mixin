@@ -18,7 +18,7 @@ Usage:
 var mixins = require('smart-mixin');
 
 // define a mixin behavior
-var mixIntoGameObject = ({
+var mixIntoGameObject = mixins({
     // this can only be defined once, will throw otherwise
     render: mixins.ONCE,
 
