@@ -36,14 +36,18 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
             // behave like the key wasn't defined
             if (left === undefined && right === undefined) return;
 
+            var wrapIfFunction = function(thing){
+                return typeof thing !== "function" ? thing 
+                : function(){
+                    thing.call(this, arguments, thrower);
+                };
+            };
+
             // do we have a rule for this key?
             if (rule) {
                 // may throw here
                 var fn = rule(left, right, key);
-                source[key] = function(){ 
-                    // may call thrower, which... throws
-                    fn.call(this, arguments, thrower); 
-                };
+                source[key] = wrapIfFunction(fn);
                 return;
             }
 
@@ -57,7 +61,7 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
              || leftIsFn && rightIsFn) {
                 // may throw, the default is ONCE so if both are functions
                 // the default is to throw
-                source[key] = opts.unknownFunction(left, right, key);
+                source[key] = wrapIfFunction(opts.unknownFunction(left, right, key));
                 return;
             }
 
@@ -94,15 +98,16 @@ mixins.MANY_MERGED = function(left, right, key){
         var res1 = right && right.apply(this, args);
         var res2 = left && left.apply(this, args);
         if (res1 && res2) {
-            var assertObject = function(obj){
+            var assertObject = function(obj, obj2){
                 var type = objToStr(obj);
                 if (type !== '[object Object]') {
                     var displayType = obj.constructor ? obj.constructor.name : 'Unknown';
-                    thrower('cannot merge returned value of type ' + displayType + ' with an object');
+                    var displayType2 = obj2.constructor ? obj2.constructor.name : 'Unknown';
+                    thrower('cannot merge returned value of type ' + displayType + ' with an ' + displayType2);
                 }
             };
-            assertObject(res1);
-            assertObject(res2);
+            assertObject(res1, res2);
+            assertObject(res2, res1);
 
             var result = {};
             Object.keys(res1).forEach(function(k){
