@@ -64,5 +64,19 @@ describe('mixin utilities', function(){
         it('throws with duplicate keys', function(){
             expect(test({a: 1}, {a: 2})).to.throwException(/cannot merge.*both.*"a"/);
         });
+
+        it('doesn\'t throw when either operand is undefined', function(){
+            expect(test(undefined, {a: 2})).to.not.throwException();
+            expect(test(undefined, {a: 2})()).to.eql({a: 2});
+
+            expect(test({a: 5}, undefined)).to.not.throwException();
+            expect(test({a: 5}, undefined)()).to.eql({a: 5});
+        });
+
+        it('throws when passed an array', function(){
+            expect(test([1, 2], {a: 3})).to.throwException(/cannot merge.*Array.*Object/);
+            expect(test({a: 3}, [1, 2])).to.throwException(/cannot merge.*Array.*Object/);
+            expect(test(7, [1, 2])).to.throwException(/cannot merge.*Array.*Number/);
+        });
     });
 });
