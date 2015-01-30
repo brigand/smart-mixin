@@ -1,4 +1,4 @@
-# smart-mixin
+![travis](https://travis-ci.org/brigand/smart-mixin.svg)
 
 Mixins with smart merging strategies and errors over silent failure.
 
