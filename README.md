@@ -117,7 +117,7 @@ mixIntoGameObject(Duck.prototype, mixin);
 # That's it
 
 Nothing too crazy, this was mostly built for use in react-class-mixins, but hopefully
-is useful to other people.  It's fully tested and ready for production use in node and the browser.
+is useful to other people.  I'll be adding more test coverage (the mixin.FN apis are fully tested, but not the actual mixin function).  Any bug reports will be fixed ASAP.
 
 # License
 
