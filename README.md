@@ -49,7 +49,7 @@ var mixIntoGameObject = mixins({
     // in REDUCE_RIGHT this looks like sourceFn(mixinFn(...args));
     // of course the `this` value is still preserved
     countChickens: mixins.REDUCE_LEFT,
-    countDucks: mixins.REDUCE_RIGHT
+    countDucks: mixins.REDUCE_RIGHT,
 
     // define your own handler for it
     // the two operands are the value of onKeyPress on each object
@@ -100,7 +100,7 @@ var mixin = {
     }
 };
 
-class Duck(){
+class Duck {
     render(){
         console.log(this.getState(5)); // {baz: 4, bar: 6}
     }
@@ -112,6 +112,9 @@ class Duck(){
 
 // apply the mixin
 mixIntoGameObject(Duck.prototype, mixin);
+
+// use it
+new Duck().render();
 ```
 
 # That's it
