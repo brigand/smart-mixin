@@ -39,7 +39,7 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
             var wrapIfFunction = function(thing){
                 return typeof thing !== "function" ? thing 
                 : function(){
-                    thing.call(this, arguments, thrower);
+                    return thing.call(this, arguments, thrower);
                 };
             };
 
