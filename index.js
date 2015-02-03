@@ -20,6 +20,7 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
                 throw new TypeError('Cannot mixin key ' + key + ' because it is provided by multiple sources, '
                         + 'and the types are ' + getTypeName(left) + ' and ' + getTypeName(right));
             }
+            return left === undefined ? right : left;
         };
     }
 

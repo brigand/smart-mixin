@@ -86,25 +86,62 @@ describe('mixin into objects', function(){
         it('returns the mixer result', function(){
             mixins({
                 add: function(left, right){
-                    return function(){ return 'sentinial' }
+                    return function(){ return 'sentinel' }
                 }
             })(klass.prototype, {add: function(){}});
-            expect(new klass().add()).to.be('sentinial');
+            expect(new klass().add()).to.be('sentinel');
         });
 
         it('allows mixer to return arbitrary values', function(){
             mixins({
                 add: function(left, right){
-                    return left.length + ' sentinial'
+                    return left.length + ' sentinel'
                 }
             })(klass.prototype, {add: function(){}});
-            expect(new klass().add).to.be('2 sentinial');
+            expect(new klass().add).to.be('2 sentinel');
         });
 
         it('defaults to ONCE', function(){
             expect(function(){
                 mixin(klass.prototype, {add: function(){}});
             }).to.throwException();
+        });
+
+    });
+
+    describe('nonFunctionProperty', function(){
+        it('throws if both are defined', function(){
+            expect(function(){
+                mixins({})({foo: 'foo'}, {foo: 'bar'});
+            }).to.throwException(/Cannot mixin.*foo.*types are String and String/g);
+        });
+
+        it('doesn\'t care which side the key is on', function(){
+            var m = mixins({});
+            var first = {foo: 'bar'};
+            m(first, {});
+            expect(first.foo).to.be('bar');
+
+            var second = {};
+            m(second, {foo: 'baz'});
+            expect(second.foo).to.be('baz');
+        });
+
+        it('handles null correctly', function(){
+            var m = mixins({});
+            var first = {foo: null};
+            m(first, {});
+            expect(first.foo).to.be(null);
+
+            var second = {};
+            m(second, {foo: null});
+            expect(second.foo).to.be(null);
+       
+            var third = {foo: null};
+            expect(function(){ 
+                m(third, {foo: null});
+            }).to.throwException(/Cannot mixin.*foo.*types are Null and Null/g);
+
         });
     });
 
@@ -127,11 +164,11 @@ describe('mixin into objects', function(){
             mixins({}, {
                 nonFunctionProperty: function(a, b, key){ 
                     expect(a).to.be('string bar');
-                    expect(b).to.be('sentinial');
+                    expect(b).to.be('sentinel');
                     expect(key).to.be('bar');
                     return 7;
                 }
-            })(klass.prototype, {bar: 'sentinial'});
+            })(klass.prototype, {bar: 'sentinel'});
             expect(klass.prototype.bar).to.be(7);
         });
 
