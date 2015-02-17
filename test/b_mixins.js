@@ -83,6 +83,30 @@ describe('mixin into objects', function(){
             expect(bothValue).to.be(1+1+10);
         });
 
+ 
+        it('creates non-enumerable methods', function(){
+            mixin(klass.prototype, {
+                nonenumerable: function(){}
+            });
+            expect('nonenumerable' in klass.prototype).to.be.ok();
+            expect(Object.keys(klass.prototype).indexOf('nonenumerable')).to.be(-1);
+        });
+ 
+        it('doesn\'t attempt to defineProperty on existing source properties', function(){
+            Object.defineProperty(klass.prototype, 'noconfig', {writable: true});
+            mixin(klass.prototype, {
+                noconfig: function(){}
+            });
+            expect('noconfig' in klass.prototype).to.be.ok();
+            expect(Object.getOwnPropertyDescriptor(klass.prototype, 'noconfig')).to.eql({
+                writable: true,
+                enumerable: false,
+                configurable: false,
+                value: klass.prototype.noconfig
+            });
+        });
+
+
         it('returns the mixer result', function(){
             mixins({
                 add: function(left, right){

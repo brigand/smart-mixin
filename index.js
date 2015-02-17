@@ -29,6 +29,19 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
         throw error;
     };
 
+    function setNonEnumerable(target, key, value){
+        if (key in target){
+            target[key] = value;
+        }
+        else {
+            Object.defineProperty(target, key, {
+                value: value,
+                writable: true,
+                configurable: true
+            });
+        }
+    }
+
     return function applyMixin(source, mixin){
         Object.keys(mixin).forEach(function(key){
             var left = source[key], right = mixin[key], rule = rules[key];
@@ -48,7 +61,7 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
             if (rule) {
                 // may throw here
                 var fn = rule(left, right, key);
-                source[key] = wrapIfFunction(fn);
+                setNonEnumerable(source, key, wrapIfFunction(fn));
                 return;
             }
 
@@ -62,7 +75,7 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
              || leftIsFn && rightIsFn) {
                 // may throw, the default is ONCE so if both are functions
                 // the default is to throw
-                source[key] = wrapIfFunction(opts.unknownFunction(left, right, key));
+                setNonEnumerable(source, key, wrapIfFunction(opts.unknownFunction(left, right, key)));
                 return;
             }
 
