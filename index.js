@@ -1,5 +1,9 @@
 var objToStr = function(x){ return Object.prototype.toString.call(x); };
 
+var thrower = function(error){
+    throw error;
+};
+
 var mixins = module.exports = function makeMixinFunction(rules, _opts){
     var opts = _opts || {};
     if (!opts.unknownFunction) {
@@ -24,11 +28,6 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
         };
     }
 
-    // TODO: improve
-    var thrower = function(error){
-        throw error;
-    };
-
     function setNonEnumerable(target, key, value){
         if (key in target){
             target[key] = value;
@@ -51,9 +50,9 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
             if (left === undefined && right === undefined) return;
 
             var wrapIfFunction = function(thing){
-                return typeof thing !== "function" ? thing 
+                return typeof thing !== "function" ? thing
                 : function(){
-                    return thing.call(this, arguments, thrower);
+                    return thing.call(this, arguments);
                 };
             };
 
@@ -67,7 +66,7 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
 
             var leftIsFn = typeof left === "function";
             var rightIsFn = typeof right === "function";
-            
+
             // check to see if they're some combination of functions or undefined
             // we already know there's no rule, so use the unknown function behavior
             if (leftIsFn && right === undefined
@@ -83,16 +82,44 @@ var mixins = module.exports = function makeMixinFunction(rules, _opts){
             // our default is MANY_MERGED_LOOSE which will merge objects, concat arrays
             // and throw if there's a type mismatch or both are primitives (how do you merge 3, and "foo"?)
             source[key] = opts.nonFunctionProperty(left, right, key);
-        });    
+        });
     };
 };
+
+mixins._mergeObjects = function(obj1, obj2) {
+    var assertObject = function(obj, obj2){
+        var type = objToStr(obj);
+        if (type !== '[object Object]') {
+            var displayType = obj.constructor ? obj.constructor.name : 'Unknown';
+            var displayType2 = obj2.constructor ? obj2.constructor.name : 'Unknown';
+            thrower('cannot merge returned value of type ' + displayType + ' with an ' + displayType2);
+        }
+    };
+    assertObject(obj1, obj2);
+    assertObject(obj2, obj1);
+
+    var result = {};
+    Object.keys(obj1).forEach(function(k){
+        if (Object.prototype.hasOwnProperty.call(obj2, k)) {
+            thrower('cannot merge returns because both have the ' + JSON.stringify(k) + ' key');
+        }
+        result[k] = obj1[k];
+    });
+
+    Object.keys(obj2).forEach(function(k){
+        // we can skip the conflict check because all conflicts would already be found
+        result[k] = obj2[k];
+    });
+    return result;
+
+}
 
 // define our built-in mixin types
 mixins.ONCE = function(left, right, key){
     if (left && right) {
         throw new TypeError('Cannot mixin ' + key + ' because it has a unique constraint.');
     }
-    
+
     var fn = left || right;
 
     return function(args){
@@ -107,35 +134,20 @@ mixins.MANY = function(left, right, key){
     };
 };
 
+mixins.MANY_MERGED_LOOSE = function(left, right, key) {
+    if(left && right) {
+        return mixins._mergeObjects(left, right);
+    }
+
+    return left || right;
+}
+
 mixins.MANY_MERGED = function(left, right, key){
-    return function(args, thrower){
+    return function(args){
         var res1 = right && right.apply(this, args);
         var res2 = left && left.apply(this, args);
         if (res1 && res2) {
-            var assertObject = function(obj, obj2){
-                var type = objToStr(obj);
-                if (type !== '[object Object]') {
-                    var displayType = obj.constructor ? obj.constructor.name : 'Unknown';
-                    var displayType2 = obj2.constructor ? obj2.constructor.name : 'Unknown';
-                    thrower('cannot merge returned value of type ' + displayType + ' with an ' + displayType2);
-                }
-            };
-            assertObject(res1, res2);
-            assertObject(res2, res1);
-
-            var result = {};
-            Object.keys(res1).forEach(function(k){
-                if (Object.prototype.hasOwnProperty.call(res2, k)) {
-                    thrower('cannot merge returns because both have the ' + JSON.stringify(k) + ' key');
-                }
-                result[k] = res1[k];
-            });
-
-            Object.keys(res2).forEach(function(k){
-                // we can skip the conflict check because all conflicts would already be found
-                result[k] = res2[k];
-            });
-            return result;
+            return mixins._mergeObjects(res1, res2)
         }
         return res2 || res1;
     };

@@ -15,7 +15,7 @@ describe('mixin utilities', function(){
         });
 
         it('calls the correct function', function(){
-            var left = sinon.stub().withArgs(7).returns(13), 
+            var left = sinon.stub().withArgs(7).returns(13),
                 right = sinon.stub().withArgs(8).returns(14);
             var res1 = mixins.ONCE(left, undefined, 'LeftTest')([7]);
             var res2 = mixins.ONCE(undefined, right, 'RightTest')([8]);
@@ -44,7 +44,7 @@ describe('mixin utilities', function(){
             var right = sinon.stub().returns(rightRet);
             var fn = mixins.MANY_MERGED(left, right, "manyMerged");
             return function(){
-                var res = fn([], function(e){ throw e }); 
+                var res = fn([], function(e){ throw e });
                 expect(left.called).to.be.ok();
                 expect(right.called).to.be.ok();
                 return res;
@@ -77,6 +77,35 @@ describe('mixin utilities', function(){
             expect(test([1, 2], {a: 3})).to.throwException(/cannot merge.*Array.*Object/);
             expect(test({a: 3}, [1, 2])).to.throwException(/cannot merge.*Array.*Object/);
             expect(test(7, [1, 2])).to.throwException(/cannot merge.*Array.*Number/);
+        });
+    });
+
+    describe('mixins.MANY_MERGED_LOOSE', function(){
+        var test = function(left, right){
+            return mixins.MANY_MERGED_LOOSE(left, right, "manyMergedLoose");
+        };
+
+        it('merges two objects', function(){
+            var res = test({a: 1}, {b: 2});
+            expect(res).to.eql({a: 1, b: 2});
+        });
+
+        it('throws with duplicate keys', function(){
+            expect(test).withArgs({a: 1}, {a: 2}).to.throwException(/cannot merge.*both.*"a"/);
+        });
+
+        it('doesn\'t throw when either operand is undefined', function(){
+            expect(test).withArgs(undefined, {a: 2}).to.not.throwException();
+            expect(test(undefined, {a: 2})).to.eql({a: 2});
+
+            expect(test).withArgs({a: 5}, undefined).to.not.throwException();
+            expect(test({a: 5}, undefined)).to.eql({a: 5});
+        });
+
+        it('throws when passed an array', function(){
+            expect(test).withArgs([1, 2], {a: 3}).to.throwException(/cannot merge.*Array.*Object/);
+            expect(test).withArgs({a: 3}, [1, 2]).to.throwException(/cannot merge.*Array.*Object/);
+            expect(test).withArgs([1, 2], 7).to.throwException(/cannot merge.*Array.*Number/);
         });
     });
 });
