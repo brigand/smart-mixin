@@ -95,6 +95,11 @@ mixins._mergeObjects = function(obj1, obj2) {
             thrower('cannot merge returned value of type ' + displayType + ' with an ' + displayType2);
         }
     };
+
+    if (Array.isArray(obj1) && Array.isArray(obj2)) {
+        return obj1.concat(obj2);
+    }
+
     assertObject(obj1, obj2);
     assertObject(obj2, obj1);
 

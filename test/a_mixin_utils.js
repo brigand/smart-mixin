@@ -94,6 +94,11 @@ describe('mixin utilities', function(){
             expect(test).withArgs({a: 1}, {a: 2}).to.throwException(/cannot merge.*both.*"a"/);
         });
 
+        it('merges two arrays', function(){
+            var res = test([1, 2], [3, 4]);
+            expect(res).to.eql([1, 2, 3, 4]);
+        });
+
         it('doesn\'t throw when either operand is undefined', function(){
             expect(test).withArgs(undefined, {a: 2}).to.not.throwException();
             expect(test(undefined, {a: 2})).to.eql({a: 2});

@@ -32,7 +32,6 @@ var mixIntoGameObject = mixins({
     // will throw when duplicate keys are found
     getState: mixins.MANY_MERGED,
 
-    // TODO: this isn't currently implemented, PR welcome (or I'll get around to it)
     // like MANY_MERGED but also handles arrays, and non-function properties
     // the behavior expressed in pseudo pattern matching syntax:
     //  undefined, y:any => y
@@ -50,6 +49,8 @@ var mixIntoGameObject = mixins({
     // of course the `this` value is still preserved
     countChickens: mixins.REDUCE_LEFT,
     countDucks: mixins.REDUCE_RIGHT,
+
+    
 
     // define your own handler for it
     // the two operands are the value of onKeyPress on each object
