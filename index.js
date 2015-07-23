@@ -160,7 +160,7 @@ mixins.MANY_MERGED = function(left, right, key){
 
 
 mixins.REDUCE_LEFT = function(_left, _right, key){
-    var left = _left || function(){ return x };
+    var left = _left || function(x){ return x };
     var right = _right || function(x){ return x };
     return function(args){
         return right.call(this, left.apply(this, args));
@@ -168,7 +168,7 @@ mixins.REDUCE_LEFT = function(_left, _right, key){
 };
 
 mixins.REDUCE_RIGHT = function(_left, _right, key){
-    var left = _left || function(){ return x };
+    var left = _left || function(x){ return x };
     var right = _right || function(x){ return x };
     return function(args){
         return left.call(this, right.apply(this, args));
