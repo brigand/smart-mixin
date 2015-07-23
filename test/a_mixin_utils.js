@@ -38,6 +38,30 @@ describe('mixin utilities', function(){
         });
     });
 
+    describe('mixins.REDUCE_LEFT', function(){
+        it('calls both functions in master to mixin order', function(){
+            var left = sinon.stub().returns(13);
+            var right = sinon.stub().returns(14);
+
+            var res = mixins.REDUCE_LEFT(left, right, "callsBoth")([9]);
+            expect(left.called).to.be.ok();
+            expect(right.called).to.be.ok();
+            expect(res).to.be(14);
+        });
+    });
+
+    describe('mixins.REDUCE_RIGHT', function(){
+        it('calls both functions in mixin to master order', function(){
+            var left = sinon.stub().returns(13);
+            var right = sinon.stub().returns(14);
+
+            var res = mixins.REDUCE_RIGHT(left, right, "callsBoth")([9]);
+            expect(left.called).to.be.ok();
+            expect(right.called).to.be.ok();
+            expect(res).to.be(13);
+        });
+    });
+
     describe('mixins.MANY_MERGED', function(){
         var test = function(leftRet, rightRet){
             var left = sinon.stub().returns(leftRet);
