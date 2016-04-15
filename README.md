@@ -9,7 +9,7 @@ Install with one of:
 npm install --save smart-mixin
 
 # will expose window.smartMixin or the smartMixin AMD module
-curl 'wzrd.in/standalone/smart-mixin@1' > vendor/smart-mixin.js
+curl 'wzrd.in/standalone/smart-mixin@2' > vendor/smart-mixin.js
 ```
 
 Usage:
