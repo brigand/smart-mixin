@@ -9,7 +9,7 @@ Install with one of:
 npm install --save smart-mixin
 
 # will expose window.smartMixin or the smartMixin AMD module
-curl 'wzrd.in/standalone/smart-mixin@1' > vendor/smart-mixin.js 
+curl 'wzrd.in/standalone/smart-mixin@1' > vendor/smart-mixin.js
 ```
 
 Usage:
@@ -50,7 +50,7 @@ var mixIntoGameObject = mixins({
     countChickens: mixins.REDUCE_LEFT,
     countDucks: mixins.REDUCE_RIGHT,
 
-    
+
 
     // define your own handler for it
     // the two operands are the value of onKeyPress on each object
@@ -59,20 +59,17 @@ var mixIntoGameObject = mixins({
     // here we allow event.stopImmediatePropagation() to prevent the next mixin from
     // being called
     // key is 'onKeyPress' here, this allows reuse of these functions
-    // args is the arguments we were called with; treat it like an arraylike object
-    // thrower is a special function which attempts to improve the error stack by including
-    // the location where it was actually mixed in
     onKeyPress: function(left, right, key) {
         left = left || function(){};
         right = right || function(){};
-        return function(args, thrower){
+        return function(event){
             var event = args[0];
 
-            if (!event) thrower(TypeError(key + ' called without an event object'));
+            if (!event) throw new TypeError(key + ' called without an event object');
 
-            var ret = left.apply(this, args);
+            var ret = left.apply(this, arguments);
             if (event && !event.immediatePropagationIsStopped) {
-                var ret2 = right.apply(this, args);    
+                var ret2 = right.apply(this, arguments);
             }
             return ret || ret2;
         }
@@ -97,7 +94,7 @@ var mixIntoGameObject = mixins({
 // simple usage example
 var mixin = {
     getState(foo){
-        return {bar: foo+1}    
+        return {bar: foo+1}
     }
 };
 

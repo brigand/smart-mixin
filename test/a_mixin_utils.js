@@ -17,8 +17,8 @@ describe('mixin utilities', function(){
         it('calls the correct function', function(){
             var left = sinon.stub().withArgs(7).returns(13),
                 right = sinon.stub().withArgs(8).returns(14);
-            var res1 = mixins.ONCE(left, undefined, 'LeftTest')([7]);
-            var res2 = mixins.ONCE(undefined, right, 'RightTest')([8]);
+            var res1 = mixins.ONCE(left, undefined, 'LeftTest')(7);
+            var res2 = mixins.ONCE(undefined, right, 'RightTest')(8);
 
             expect(left.called).to.be.ok();
             expect(right.called).to.be.ok();
@@ -28,10 +28,20 @@ describe('mixin utilities', function(){
 
     describe('mixins.MANY', function(){
         it('calls both functions', function(){
-            var left = sinon.stub().returns(13);
-            var right = sinon.stub().returns(14);
+            var left = sinon.stub().withArgs(9).returns(13);
+            var right = sinon.stub().withArgs(9).returns(14);
 
-            var res = mixins.MANY(left, right, "callsBoth")([9]);
+            var res = mixins.MANY(left, right, "callsBoth")(9);
+            expect(left.called).to.be.ok();
+            expect(right.called).to.be.ok();
+            expect(res).to.be(13);
+        });
+
+        it('passes multiple arguments to both functions', function(){
+            var left = sinon.stub().withArgs(1, 2, 3, 'foo').returns(13);
+            var right = sinon.stub().withArgs(1, 2, 3, 'foo').returns(14);
+
+            var res = mixins.MANY(left, right, "callsBoth")(1, 2, 3, 'foo');
             expect(left.called).to.be.ok();
             expect(right.called).to.be.ok();
             expect(res).to.be(13);
@@ -40,10 +50,10 @@ describe('mixin utilities', function(){
 
     describe('mixins.REDUCE_LEFT', function(){
         it('calls both functions in master to mixin order', function(){
-            var left = sinon.stub().returns(13);
-            var right = sinon.stub().returns(14);
+            var left = sinon.stub().withArgs(9).returns(13);
+            var right = sinon.stub().withArgs(9).returns(14);
 
-            var res = mixins.REDUCE_LEFT(left, right, "callsBoth")([9]);
+            var res = mixins.REDUCE_LEFT(left, right, "callsBoth")(9);
             expect(left.called).to.be.ok();
             expect(right.called).to.be.ok();
             expect(res).to.be(14);
@@ -52,10 +62,10 @@ describe('mixin utilities', function(){
 
     describe('mixins.REDUCE_RIGHT', function(){
         it('calls both functions in mixin to master order', function(){
-            var left = sinon.stub().returns(13);
-            var right = sinon.stub().returns(14);
+            var left = sinon.stub().withArgs(9).returns(13);
+            var right = sinon.stub().withArgs(9).returns(14);
 
-            var res = mixins.REDUCE_RIGHT(left, right, "callsBoth")([9]);
+            var res = mixins.REDUCE_RIGHT(left, right, "callsBoth")(9);
             expect(left.called).to.be.ok();
             expect(right.called).to.be.ok();
             expect(res).to.be(13);
@@ -68,7 +78,7 @@ describe('mixin utilities', function(){
             var right = sinon.stub().returns(rightRet);
             var fn = mixins.MANY_MERGED(left, right, "manyMerged");
             return function(){
-                var res = fn([], function(e){ throw e });
+                var res = fn();
                 expect(left.called).to.be.ok();
                 expect(right.called).to.be.ok();
                 return res;
