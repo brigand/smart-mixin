@@ -6,6 +6,10 @@
   "scripts": {
     "test": "mocha test/*"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brigand/smart-mixin.git"
+  },
   "keywords": [
     "class",
     "es6",
